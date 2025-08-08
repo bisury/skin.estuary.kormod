@@ -540,14 +540,14 @@ msgctxt "#31161"
 msgid "Numeric pad"
 msgstr "숫자 패드"
 
-msgctxt "#31162"
+msgctxt "#31170"
 msgid "NEXON Lv1 Gothic Font"
 msgstr "넥슨 Lv1 고딕 글꼴"
 
-msgctxt "#31163"
+msgctxt "#31171"
 msgid "Gmarket Sans Font"
 msgstr "지마켓 산스 글꼴"
 
-msgctxt "#31164"
+msgctxt "#31172"
 msgid "Hangame Poker Font"
 msgstr "한게임 포커 글꼴"

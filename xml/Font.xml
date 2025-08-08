@@ -242,7 +242,7 @@
 			<size>30</size>
 		</font>
 	</fontset>
-	<fontset id="NEXONLv1Gothic" idloc="31162">
+	<fontset id="NEXONLv1Gothic" idloc="31170">
 		<!-- Normal Fonts -->
 		<font>
 			<name>font10</name>
@@ -369,7 +369,7 @@
 			<size>30</size>
 		</font>
 	</fontset>
-	<fontset id="GmarketSans" idloc="31163">
+	<fontset id="GmarketSans" idloc="31171">
 		<!-- Normal Fonts -->
 		<font>
 			<name>font10</name>
@@ -496,7 +496,7 @@
 			<size>30</size>
 		</font>
 	</fontset>
-	<fontset id="HangamePoker" idloc="31164">
+	<fontset id="HangamePoker" idloc="31172">
 		<!-- Normal Fonts -->
 		<font>
 			<name>font10</name>
