@@ -2,8 +2,6 @@
 <addon id="skin.estuary.kormod" version="21.2.1+omega.24" name="Estuary MOD KOR" provider-name="phil65, Ichabod Fletchman, bisury">
 	<requires>
 		<import addon="xbmc.gui" version="5.17.0" />
-		<import addon="script.skinshortcuts" version="2.0.1" />
-		<import addon="script.skinvariables" version="2.1.30" />
 	</requires>
 	<extension point="xbmc.gui.skin" debugging="false">
 		<res width="1920" height="1440" aspect="1.33" default="false" folder="xml" />
