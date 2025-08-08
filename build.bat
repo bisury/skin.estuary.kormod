@@ -1,26 +1,47 @@
 @echo off
-ECHO ----------------------------------------
-echo Creating Estuary Build Folder
-IF Exist %base_dir%\project\Win32BuildSetup\BUILD_WIN32\application\addons\skin.estuary rmdir %base_dir%\project\Win32BuildSetup\BUILD_WIN32\application\addons\skin.estuary /S /Q
-md %base_dir%\project\Win32BuildSetup\BUILD_WIN32\application\addons\skin.estuary\media\
+setlocal enabledelayedexpansion
 
-Echo .svn>exclude.txt
-Echo Thumbs.db>>exclude.txt
-Echo Desktop.ini>>exclude.txt
-Echo dsstdfx.bin>>exclude.txt
-Echo build.bat>>exclude.txt
-Echo \skin.estuary\media\>>exclude.txt
-Echo \skin.estuary\themes\>>exclude.txt
-Echo exclude.txt>>exclude.txt
+set "ADDON_NAME=skin.estuary.kormod"
+set "ZIP_FILE=..\%ADDON_NAME%.zip"
+set "TEMP_DIR=..\_temp_build_%ADDON_NAME%"
 
-ECHO ----------------------------------------
-ECHO Creating XBT File...
-START /B /WAIT %base_dir%\Tools\TexturePacker\TexturePacker -dupecheck -input media -output %base_dir%\project\Win32BuildSetup\BUILD_WIN32\application\addons\skin.estuary\media\Textures.xbt
-START /B /WAIT %base_dir%\Tools\TexturePacker\TexturePacker -dupecheck -input themes\curial -output %base_dir%\project\Win32BuildSetup\BUILD_WIN32\application\addons\skin.estuary\media\curial.xbt
+REM --- Cleanup ---
+echo Cleaning up previous build...
+if exist "%ZIP_FILE%" del "%ZIP_FILE%"
+if exist "%TEMP_DIR%" rmdir /s /q "%TEMP_DIR%"
 
-ECHO ----------------------------------------
-ECHO XBT Texture Files Created...
-ECHO Building Skin Directory...
-xcopy "..\skin.estuary" "%base_dir%\project\Win32BuildSetup\BUILD_WIN32\application\addons\skin.estuary" /E /Q /I /Y /EXCLUDE:exclude.txt
+REM --- Create temporary directory and copy files ---
+echo Creating temporary directory...
+mkdir "%TEMP_DIR%"
 
+echo Creating exclude file list...
+(
+    echo .git\
+    echo .gitignore
+    echo build.bat
+    echo *.zip
+    echo diff.patch
+    echo _temp_build*
+    echo exclude.txt
+) > exclude.txt
+
+echo Copying files to temporary directory...
+xcopy . "%TEMP_DIR%\%ADDON_NAME%\" /E /I /Y /Q /EXCLUDE:exclude.txt
+
+REM --- Create Zip Archive ---
+echo Creating zip archive...
+pushd "%TEMP_DIR%"
+tar -acf "%ADDON_NAME%.zip" "%ADDON_NAME%"
+popd
+
+REM --- Move zip file and cleanup ---
+echo Moving zip file...
+move "%TEMP_DIR%\%ADDON_NAME%.zip" "%ZIP_FILE%"
+
+echo Cleaning up temporary files...
+rmdir /s /q "%TEMP_DIR%"
 del exclude.txt
+
+echo.
+echo Addon package created successfully: %ZIP_FILE%
+pause
