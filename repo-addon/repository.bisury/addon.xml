@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.bisury" name="bisury Kodi Add-ons" version="1.0.0" provider-name="bisury">
+	<requires>
+		<import addon="xbmc.addon" version="12.0.0" />
+	</requires>
+	<extension point="xbmc.addon.repository" name="bisury Kodi Add-ons">
+		<info compressed="false">https://bisury.github.io/skin.estuary.kormod/addons.xml</info>
+		<checksum>https://bisury.github.io/skin.estuary.kormod/addons.xml.md5</checksum>
+		<datadir zip="true">https://bisury.github.io/skin.estuary.kormod/zips/</datadir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="ko_KR">bisury의 개인 Kodi 애드온 저장소</summary>
+		<description lang="ko_KR">skin.estuary.kormod (Estuary MOD KOR) 자동 업데이트를 위한 개인 저장소입니다.</description>
+		<platform>all</platform>
+	</extension>
+</addon>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estuary MOD KOR — Kodi Repository</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: #101418; color: #dfe5ec; font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  main { max-width: 640px; padding: 40px 32px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  .sub { color: #8b97a5; margin: 0 0 24px; }
+  .ver { display: inline-block; background: #1c2530; border: 1px solid #2c3a4a; border-radius: 6px;
+         padding: 4px 10px; font-size: 13px; color: #9fd0ff; margin-bottom: 24px; }
+  a.btn { display: inline-block; background: #17a3dd; color: #fff; text-decoration: none;
+          padding: 10px 18px; border-radius: 8px; font-weight: 600; }
+  ol { line-height: 1.9; padding-left: 20px; }
+  code { background: #1c2530; border-radius: 4px; padding: 2px 6px; font-size: 13px; color: #9fd0ff; }
+  .note { color: #8b97a5; font-size: 13px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Estuary MOD KOR</h1>
+  <p class="sub">Kodi 21 (Omega) 개인 스킨 저장소</p>
+  <p><span class="ver" id="ver">배포 버전 확인 중…</span></p>
+  <p><a class="btn" href="repository.bisury-1.0.0.zip">repository.bisury-1.0.0.zip 다운로드</a></p>
+  <h2>Kodi에 설치하기 (기기당 1회)</h2>
+  <ol>
+    <li>Kodi: 설정 → 파일 관리자 → 소스 추가 → <code>https://bisury.github.io/skin.estuary.kormod/</code></li>
+    <li>애드온 → zip 파일에서 설치 → 추가한 소스 → <code>repository.bisury-1.0.0.zip</code></li>
+    <li>애드온 → 저장소에서 설치 → bisury Kodi Add-ons → <b>Estuary MOD KOR</b> 설치</li>
+  </ol>
+  <p class="note">이후 업데이트는 Kodi가 저장소에서 자동으로 확인합니다.<br>
+  즉시 업데이트: 애드온 → Estuary MOD KOR → 업데이트 확인</p>
+</main>
+<script>
+  fetch('addons.xml').then(r => r.ok ? r.text() : Promise.reject()).then(t => {
+    const m = t.match(/<addon\b[^>]*\bversion="([^"]+)"/);
+    if (m) document.getElementById('ver').textContent = '현재 배포 버전: ' + m[1];
+    else document.getElementById('ver').textContent = '버전 정보를 찾을 수 없습니다';
+  }).catch(() => {
+    document.getElementById('ver').textContent = '배포 준비 중입니다';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+name: publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Compute next version
+        id: version
+        run: |
+          python3 - <<'EOF'
+          import os
+          import re
+          import subprocess
+
+          src = open('addon.xml', encoding='utf-8').read()
+          src_version = re.search(r'<addon\b[^>]*\bversion="([^"]+)"', src).group(1)
+
+          def split_version(v):
+              m = re.match(r'^(.+)\.(\d+)$', v)
+              if m and ('+' in v or v.count('.') >= 2):
+                  return m.group(1), int(m.group(2))
+              return v, 0
+
+          base, n = split_version(src_version)
+          tags = subprocess.run(['git', 'tag', '-l', 'repo-v*'],
+                                capture_output=True, text=True).stdout.split()
+          for tag in tags:
+              tag_base, tag_n = split_version(tag[len('repo-v'):])
+              if tag_base == base and tag_n >= n:
+                  n = tag_n + 1
+
+          version = f'{base}.{n}'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'version={version}\n')
+          print(f'source version: {src_version} -> publish version: {version}')
+          EOF
+
+      - name: Package skin
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          mkdir -p dist
+          rsync -a ./ dist/skin.estuary.kormod/ \
+            --exclude .git/ \
+            --exclude .github/ \
+            --exclude .commandcode/ \
+            --exclude dist/ \
+            --exclude repo-addon/ \
+            --exclude .gitignore \
+            --exclude build.bat \
+            --exclude exclude.txt \
+            --exclude '*.zip' \
+            --exclude diff.patch \
+            --exclude '_temp_build*' \
+            --exclude README.md
+          python3 - "$VERSION" <<'EOF'
+          import re
+          import sys
+
+          version = sys.argv[1]
+          path = 'dist/skin.estuary.kormod/addon.xml'
+          src = open(path, encoding='utf-8').read()
+          out = re.sub(r'(<addon\b[^>]*\bversion=")[^"]*(")',
+                       lambda m: m.group(1) + version + m.group(2), src, count=1)
+          open(path, 'w', encoding='utf-8').write(out)
+          EOF
+          (cd dist && zip -qr "skin.estuary.kormod-$VERSION.zip" skin.estuary.kormod)
+
+      - name: Build repository files
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          mkdir -p pages/zips/skin.estuary.kormod repo-zip/repository.bisury
+          python3 - <<'EOF'
+          src = open('dist/skin.estuary.kormod/addon.xml', encoding='utf-8').read()
+          body = src.split('?>', 1)[1].lstrip('\n') if src.startswith('<?xml') else src
+          open('pages/addons.xml', 'w', encoding='utf-8').write(
+              '<addons>\n' + body.rstrip('\n') + '\n</addons>\n')
+          EOF
+          md5sum pages/addons.xml | awk '{print $1}' > pages/addons.xml.md5
+          cp "dist/skin.estuary.kormod-$VERSION.zip" \
+             "pages/zips/skin.estuary.kormod/skin.estuary.kormod-$VERSION.zip"
+          cp repo-addon/repository.bisury/addon.xml repo-zip/repository.bisury/addon.xml
+          (cd repo-zip && zip -qr ../pages/repository.bisury-1.0.0.zip repository.bisury)
+          cp repo-addon/index.html pages/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Tag published version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "repo-v$VERSION"
+          git push origin "repo-v$VERSION"
